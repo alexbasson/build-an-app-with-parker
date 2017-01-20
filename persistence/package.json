@@ -1,0 +1,6 @@
+{
+  "name": "persistence",
+  "version":  "0.0.0",
+  "main": "src/gamesRepo.js",
+  "files": ["src/"]
+}

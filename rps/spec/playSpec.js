@@ -1,104 +1,74 @@
-function play(p1, p2, ui){
-    new PlayUseCase(p1, p2, ui).execute()
-}
+const play = require('../src/play')
+const FakeGamesRepo = require('./fakeGamesRepo')
 
-const PlayUseCase = function(p1, p2, ui){
-    this.execute = function(){
-        if (invalid()){
-            ui.invalidInput()
-        } else if (tie()){
-            ui.tie()
-        } else if (playerOneWins()) {
-            ui.p1Wins()
-        } else {
-            ui.p2Wins()
-        }
-    }
+describe("play", function () {
+  let ui
+  let repo
 
-    function playerOneWins() {
-        return p1 == "rock" && p2 == "scissors" ||
-            p1 == "paper" && p2 == "rock" ||
-            p1 == "scissors" && p2 == "paper";
-    }
+  beforeEach(function () {
+    ui = jasmine.createSpyObj("ui", ["tie", "p1Wins", "p2Wins", "invalidInput"])
+    repo = new FakeGamesRepo()
+  })
 
-    function tie() {
-        return p1 === p2;
-    }
+  it("paper v. scissors: p2 wins", function () {
+    play("paper", "scissors", ui, repo)
 
-    function invalid() {
-        var validInputs = ["rock", "paper", "scissors"]
+    expect(ui.p2Wins).toHaveBeenCalled()
+  })
 
-        return !validInputs.includes(p1) || !validInputs.includes(p2);
-    }
-}
+  it("scissors v. paper: p1 wins", function () {
+    play("scissors", "paper", ui, repo)
 
-describe("rock paper scissors", function () {
-    let ui
+    expect(ui.p1Wins).toHaveBeenCalled()
+  })
 
-    beforeEach(function () {
-        ui = jasmine.createSpyObj("ui", ["tie", "p1Wins", "p2Wins", "invalidInput"])
-    })
+  it("paper v. rock: p1 wins", function () {
+    play("paper", "rock", ui, repo)
 
-    it("paper v. scissors: p2 wins", function(){
-        play("paper", "scissors", ui)
+    expect(ui.p1Wins).toHaveBeenCalled()
+  })
 
-        expect(ui.p2Wins).toHaveBeenCalled()
-    })
+  it("rock v. paper: p2 wins", function () {
+    play("rock", "paper", ui, repo)
 
-    it("scissors v. paper: p1 wins", function(){
-        play("scissors", "paper", ui)
+    expect(ui.p2Wins).toHaveBeenCalled()
+  })
 
-        expect(ui.p1Wins).toHaveBeenCalled()
-    })
+  it("rock v. rock: tie", function () {
 
-    it("paper v. rock: p1 wins", function(){
-        play("paper", "rock", ui)
+    play("rock", "rock", ui, repo)
 
-        expect(ui.p1Wins).toHaveBeenCalled()
-    })
+    expect(ui.tie).toHaveBeenCalled()
+  })
 
-    it("rock v. paper: p2 wins", function(){
-        play("rock", "paper", ui)
+  it("rock v. scissors: p1 wins", function () {
+    play("rock", "scissors", ui, repo)
 
-        expect(ui.p2Wins).toHaveBeenCalled()
-    })
+    expect(ui.p1Wins).toHaveBeenCalled()
+  })
 
-    it("rock v. rock: tie", function () {
+  it("scissors v. rock: p2 wins", function () {
+    play("scissors", "rock", ui, repo)
 
-        play("rock", "rock", ui)
+    expect(ui.p2Wins).toHaveBeenCalled()
+  })
 
-        expect(ui.tie).toHaveBeenCalled()
-    })
+  it("sailboat v. rock", function () {
+    play("sailboat", "rock", ui, repo)
 
-    it("rock v. scissors: p1 wins", function(){
-        play("rock", "scissors", ui)
+    expect(ui.invalidInput).toHaveBeenCalled()
+  })
 
-        expect(ui.p1Wins).toHaveBeenCalled()
-    })
+  it("rock v. sailboat", function () {
+    play("rock", "sailboat", ui, repo)
 
-    it("scissors v. rock: p2 wins", function(){
-        play("scissors", "rock", ui)
+    expect(ui.invalidInput).toHaveBeenCalled()
+  })
 
-        expect(ui.p2Wins).toHaveBeenCalled()
-    })
+  it("sailboat v. sailboat", function () {
+    play("sailboat", "sailboat", ui, repo)
 
-    it("sailboat v. rock", function () {
-        play("sailboat", "rock", ui)
-
-        expect(ui.invalidInput).toHaveBeenCalled()
-    })
-
-    it("rock v. sailboat", function () {
-        play("rock", "sailboat", ui)
-
-        expect(ui.invalidInput).toHaveBeenCalled()
-    })
-
-    it("sailboat v. sailboat", function(){
-        play("sailboat", "sailboat", ui)
-
-        expect(ui.invalidInput).toHaveBeenCalled()
-        expect(ui.tie).not.toHaveBeenCalled()
-    })
-
+    expect(ui.invalidInput).toHaveBeenCalled()
+    expect(ui.tie).not.toHaveBeenCalled()
+  })
 })
